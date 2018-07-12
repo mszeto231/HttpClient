@@ -1,0 +1,16 @@
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\HttpClient.csprojResolveAssemblyReference.cache
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\MainWindow.g.cs
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\App.g.cs
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\HttpClient_MarkupCompile.cache
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\HttpClient_MarkupCompile.lref
+C:\Users\szetom2\Documents\HttpClient\HttpClient\bin\Debug\HttpClient.exe.config
+C:\Users\szetom2\Documents\HttpClient\HttpClient\bin\Debug\HttpClient.exe
+C:\Users\szetom2\Documents\HttpClient\HttpClient\bin\Debug\HttpClient.pdb
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\MainWindow.baml
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\HttpClient.g.resources
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\HttpClient.Properties.Resources.resources
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\HttpClient.csproj.GenerateResource.Cache
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\HttpClient.csproj.CoreCompileInputs.cache
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\HttpClient.exe
+C:\Users\szetom2\Documents\HttpClient\HttpClient\obj\Debug\HttpClient.pdb
