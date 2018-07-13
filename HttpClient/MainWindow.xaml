@@ -1,9 +1,9 @@
-﻿<Window x:Class="HttpClient.MainWindow"
+﻿<Window x:Class="HttpClientTester.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:HttpClient"
+        xmlns:local="clr-namespace:HttpClientTester"
         mc:Ignorable="d"
         Title="HttpClient" Height="350" Width="700">
     <Window.Resources>
@@ -12,7 +12,7 @@
     <Grid Name="mainGrid">
         <TextBox x:Name="tbUrlRequest" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text='{Binding Path=UrlRequest}' VerticalAlignment="Top" Width="570" Margin="10,10,0,0"/>
         <Button Content="Send" HorizontalAlignment="Left" Height="24" Margin="602,10,0,0" VerticalAlignment="Top" Width="80" Click="Button_Click"/>
-        <TextBlock x:Name="tbResponseBody" HorizontalAlignment="Left" Height="202" Margin="26,61,0,0" TextWrapping="Wrap" Text="Response Body" VerticalAlignment="Top" Width="474"/>
+        <TextBox x:Name="tbResponseBody" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" Height="202" Margin="26,61,0,0" TextWrapping="Wrap" Text='{Binding Path=ResponseBody}' Width="474"/>
         <TextBox x:Name="tbRequestAmount" HorizontalAlignment="Left" Height="21" Margin="629,56,0,0" TextWrapping="Wrap" Text='{Binding Path=RequestAmount, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly" />
         <Label Content="Number of Requests:" HorizontalAlignment="Left" Height="26" Margin="505,53,0,0" VerticalAlignment="Top" Width="124"/>
         <Label Content="Time Gap (seconds):" HorizontalAlignment="Left" Height="26" Margin="505,84,0,0" VerticalAlignment="Top" Width="124"/>
@@ -21,6 +21,5 @@
         <Label Content="Duration (seconds):" HorizontalAlignment="Left" Height="26" Margin="505,146,0,0" VerticalAlignment="Top" Width="124"/>
         <TextBox x:Name="tbThreadAmount" HorizontalAlignment="Left" Height="21" Margin="629,120,0,0" TextWrapping="Wrap" Text='{Binding Path=ThreadAmount, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
         <TextBox x:Name="tbDuration" HorizontalAlignment="Left" Height="21" Margin="629,151,0,0" TextWrapping="Wrap" Text='{Binding Path=Duration, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
-
     </Grid>
 </Window>

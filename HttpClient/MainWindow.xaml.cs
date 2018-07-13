@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -14,16 +15,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace HttpClient
+namespace HttpClientTester
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly Regex _regex = new Regex("[^0-9.-]+");  // text expression is a number
-
+        private static readonly Regex _regex = new Regex("^[0-9]+$");  // text expression is a number
         private RequestClient _requestClient;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -31,20 +32,23 @@ namespace HttpClient
             mainGrid.DataContext = _requestClient;
         }
 
-        // allows only numbers to be inputed to textbox
+        /// <summary> allows only numbers to be inputed to textbox </summary>
         private void TextBox_PreviewNumbersOnly(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = IsNumber(e.Text);
+            e.Handled = !IsNumber(e.Text);
         }
 
-        // TODO
+        /// <summary> Sends http request when button is clicked. Input parameters must be valid </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //tbResponseBody.Text = _urlRequest;
+            if (_requestClient.IsValidRequest())
+            {
+                 _requestClient.SendRequest();
+            }
         }
 
-        // @param: text, any string
-        // returns true if input text is a number, otherwise returns false
+        /// <param name="text"> any input string that client inputs into a textbook </param>
+        /// <returns> returns true if input text is a number, otherwise returns false</returns>
         private bool IsNumber(string text)
         {
             return _regex.IsMatch(text);

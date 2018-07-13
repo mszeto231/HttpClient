@@ -1,7 +1,7 @@
-﻿<Application x:Class="HttpClient.App"
+﻿<Application x:Class="HttpClientTester.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:HttpClient"
+             xmlns:local="clr-namespace:HttpClientTester"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          
