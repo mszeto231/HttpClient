@@ -31,7 +31,7 @@ namespace HttpClientTester
         public string UrlRequest
         {
             get { return _urlRequest; }
-            set {_urlRequest = value; }
+            set { _urlRequest = value; }
         }
 
         // binded to tbRequestAmount
@@ -61,7 +61,10 @@ namespace HttpClientTester
         public int ThreadAmount
         {
             get { return _threadAmount; }
-            set { _threadAmount = value; }
+            set
+            { _threadAmount = value;
+                NotifyPropertyChanged("ThreadAmount");
+            }
         }
 
         // binded to tbDuration
@@ -112,7 +115,6 @@ namespace HttpClientTester
         public void SendRequest()
         {
             ResponseBody = string.Empty;
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, _urlRequest);
             _countdown = new CountdownEvent(_threadAmount);
             DateTime startTime = DateTime.UtcNow;
             if (_requestAmount != 0)
@@ -146,7 +148,7 @@ namespace HttpClientTester
 
         /// <summary> Creates and sends an HTTP request  </summary>
         /// <returns> Information about the HTTP response </returns>
-        private async Task<ResponseInfo> Request()
+        public async Task<ResponseInfo> Request()
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, _urlRequest);
             try
@@ -175,11 +177,6 @@ namespace HttpClientTester
             for (int i = 0; i < reqPerThread; i++)
             {
                 ResponseInfo res = await Request();
-                Console.WriteLine(res.Time);
-                if (res.Time == 0)
-                {
-                    Console.WriteLine(res.Message);
-                }
                 ResponseBody += res.Message + "\n";
                 Thread.Sleep(_timeGap);
             }
@@ -192,7 +189,6 @@ namespace HttpClientTester
             while (time < _duration)
             {
                 ResponseInfo res = await Request();
-                Console.WriteLine(res.Time);
                 time += res.Time;
                 ResponseBody += res.Message + "\n";
                 Thread.Sleep(_timeGap);
@@ -208,6 +204,19 @@ namespace HttpClientTester
             return (_urlRequest != null && _timeGap != 0 && _threadAmount != 0) && (_duration != 0 || _requestAmount != 0);
         }
 
+        /// <returns>
+        /// return true if there is a request url
+        /// </retuns>
+        /// <returns></returns>
+        public bool IsValidSample()
+        {
+            return _urlRequest != null;
+        }
+
+        public void SetThreadAmount(int threadAmount)
+        {
+            ThreadAmount = threadAmount;
+        }
         /// <returns>
         /// returns string format of object in form of  {Property: value, Property: value, ect}
         /// </returns>

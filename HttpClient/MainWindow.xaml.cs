@@ -22,13 +22,18 @@ namespace HttpClientTester
     /// </summary>
     public partial class MainWindow : Window
     {
+        public const int REQUEST_TRYS = 100;
+        public const int REQUEST_NUMBER = 100;
         private static readonly Regex _regex = new Regex("^[0-9]+$");  // text expression is a number
+
         private RequestClient _requestClient;
+        private RequestTester _requestTester;
 
         public MainWindow()
         {
             InitializeComponent();
             _requestClient = new RequestClient();
+            _requestTester = new RequestTester(_requestClient);
             mainGrid.DataContext = _requestClient;
         }
 
@@ -52,6 +57,18 @@ namespace HttpClientTester
         private bool IsNumber(string text)
         {
             return _regex.IsMatch(text);
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            if (_requestClient.IsValidSample())
+            {
+                await _requestTester.RunTestsAsync(REQUEST_TRYS);
+                double time = _requestTester.AverageRequestTime();
+                int threads = _requestTester.ComputeThreadCount(REQUEST_NUMBER);
+                _requestClient.SetThreadAmount(threads);
+                Console.WriteLine("Test: " + _requestClient.ThreadAmount);
+            }
         }
     }
 }

@@ -19,7 +19,8 @@
         <TextBox x:Name="tbTimeGap" HorizontalAlignment="Left" Height="21" Margin="629,89,0,0" TextWrapping="Wrap" Text='{Binding Path=TimeGap, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
         <Label Content="Threads:" HorizontalAlignment="Left" Height="26" Margin="505,115,0,0" VerticalAlignment="Top" Width="124"/>
         <Label Content="Duration (seconds):" HorizontalAlignment="Left" Height="26" Margin="505,146,0,0" VerticalAlignment="Top" Width="124"/>
-        <TextBox x:Name="tbThreadAmount" HorizontalAlignment="Left" Height="21" Margin="629,120,0,0" TextWrapping="Wrap" Text='{Binding Path=ThreadAmount, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
+        <TextBox x:Name="tbThreadAmount" HorizontalAlignment="Left" Height="21" Margin="629,120,0,0" TextWrapping="Wrap" Text='{Binding Path=ThreadAmount, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
         <TextBox x:Name="tbDuration" HorizontalAlignment="Left" Height="21" Margin="629,151,0,0" TextWrapping="Wrap" Text='{Binding Path=Duration, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
+        <Button Content="Configure Parameters" HorizontalAlignment="Left" VerticalAlignment="Top" Width="132" Margin="545,191,0,0" Click="Button_Click_1"/>
     </Grid>
 </Window>
