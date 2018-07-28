@@ -54,6 +54,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EnumBindingSourceExtension.cs" />
+    <Compile Include="EnumDescriptionTypeConverter.cs" />
     <Compile Include="RequestClient.cs" />
     <Compile Include="RequestTester.cs" />
     <Compile Include="ResponseInfo.cs" />

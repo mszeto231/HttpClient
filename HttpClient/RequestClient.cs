@@ -17,37 +17,29 @@ namespace HttpClientTester
     class RequestClient : INotifyPropertyChanged
     {
         private string _urlRequest;         // url of http request
-        private int _requestAmount;         // number of requests to be sent
         private int _timeGap;               // amount of time (milliseconds) between each request
         private int _threadAmount;          // number of threads used to send requests
-        private int _duration;              // amount of time (milliseconds) for requests to be sent
         private string _responseBody;       // response body of the request made
+        private List<ResponseInfo> _responseList;
 
         private HttpClient _client;         // client used to create http requests
         private List<Thread> _threadList;   // list of threads used to run http requests
         private CountdownEvent _countdown;   // records when each thread is done
+
+        public HttpMethods HttpMethodType { get; set; }
+        public RequestType RequestType { get; set; }
+        public int RequestValue { get; set; }
+        public List<ResponseInfo> ResponseList
+        {
+            get { return _responseList; }
+            set { _responseList = value; }
+        }
 
         // binded to tbUrlRequest
         public string UrlRequest
         {
             get { return _urlRequest; }
             set { _urlRequest = value; }
-        }
-
-        // binded to tbRequestAmount
-        // if !0, sets Duration to 0
-        public int RequestAmount
-        {
-            get { return _requestAmount; }
-            set
-            {
-                if (value != 0)
-                {
-                    Duration = 0;
-                    NotifyPropertyChanged("Duration");
-                }
-                _requestAmount = value;
-            }
         }
 
         // binded to tbTimeGap
@@ -67,22 +59,6 @@ namespace HttpClientTester
             }
         }
 
-        // binded to tbDuration
-        // if !0, setRequestAmount to 0
-        public int Duration
-        {
-            get { return _duration; }
-            set
-            {
-                if (value != 0)
-                {
-                    RequestAmount = 0;
-                    NotifyPropertyChanged("RequestAmount");
-                }
-                _duration = value;
-            }
-        }
-
         // binded to tbResponseBody
         public string ResponseBody
         {
@@ -98,6 +74,7 @@ namespace HttpClientTester
         {
             _client = new HttpClient();
             _threadList = new List<Thread>();
+            _responseList = new List<ResponseInfo>();
         }
 
         /// <summary> checks if event has happended to binded textbox </summary>
@@ -109,18 +86,26 @@ namespace HttpClientTester
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public async Task<ResponseInfo> SendRequestTestAsync()
+        {
+            ResponseInfo res = await Request();
+            _responseList.Add(res);
+            Thread.Sleep(_timeGap);
+            return res;
+        }
         /// <summary>
         /// Creates and sends an HTTP request and sets ResponseBody message
         /// </summary>
         public void SendRequest()
         {
+            _responseList.Clear();
             ResponseBody = string.Empty;
             _countdown = new CountdownEvent(_threadAmount);
             DateTime startTime = DateTime.UtcNow;
-            if (_requestAmount != 0)
+            if (RequestType == RequestType.Amount)
             {
                 // sends _requestAmount of http requests
-                int reqPerThread = _requestAmount / _threadAmount;
+                int reqPerThread = RequestValue / _threadAmount;
                 for (int i = 0; i < _threadAmount; i++)
                 {
                     Thread thread = new Thread(() => AmountRequests(reqPerThread));
@@ -128,7 +113,7 @@ namespace HttpClientTester
                     thread.Start();
                 }
             }
-            else
+            else  
             {
                 // sends Http requests for _duration milliseconds
                 for (int i = 0; i < _threadAmount; i++)
@@ -150,7 +135,16 @@ namespace HttpClientTester
         /// <returns> Information about the HTTP response </returns>
         public async Task<ResponseInfo> Request()
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, _urlRequest);
+            HttpRequestMessage request;
+            if (HttpMethodType == HttpMethods.GET)
+            {
+                request = new HttpRequestMessage(HttpMethod.Get, _urlRequest);
+            }
+            else
+            {
+                request = new HttpRequestMessage(HttpMethod.Post, _urlRequest);
+            }
+
             try
             {
                 DateTime startTime = DateTime.UtcNow;
@@ -177,7 +171,7 @@ namespace HttpClientTester
             for (int i = 0; i < reqPerThread; i++)
             {
                 ResponseInfo res = await Request();
-                ResponseBody += res.Message + "\n";
+                _responseList.Add(res);
                 Thread.Sleep(_timeGap);
             }
             _countdown.Signal();
@@ -186,11 +180,11 @@ namespace HttpClientTester
         private async void DurationRequests()
         {
             double time = 0;
-            while (time < _duration)
+            while (time < RequestValue)
             {
                 ResponseInfo res = await Request();
                 time += res.Time;
-                ResponseBody += res.Message + "\n";
+                _responseList.Add(res);
                 Thread.Sleep(_timeGap);
             }
             _countdown.Signal();
@@ -201,7 +195,7 @@ namespace HttpClientTester
         /// </returns>
         public bool IsValidRequest()
         {
-            return (_urlRequest != null && _timeGap != 0 && _threadAmount != 0) && (_duration != 0 || _requestAmount != 0);
+            return (_urlRequest != null && _timeGap != 0 && _threadAmount != 0 && RequestValue != 0);
         }
 
         /// <returns>

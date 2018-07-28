@@ -1,26 +1,39 @@
 ﻿<Window x:Class="HttpClientTester.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HttpClientTester"
         mc:Ignorable="d"
-        Title="HttpClient" Height="350" Width="700">
+        Title="HttpClient" Height="350" Width="748.338">
     <Window.Resources>
         <local:IntConverter x:Key="MyConverter"/>
     </Window.Resources>
     <Grid Name="mainGrid">
-        <TextBox x:Name="tbUrlRequest" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text='{Binding Path=UrlRequest}' VerticalAlignment="Top" Width="570" Margin="10,10,0,0"/>
-        <Button Content="Send" HorizontalAlignment="Left" Height="24" Margin="602,10,0,0" VerticalAlignment="Top" Width="80" Click="Button_Click"/>
-        <TextBox x:Name="tbResponseBody" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" Height="202" Margin="26,61,0,0" TextWrapping="Wrap" Text='{Binding Path=ResponseBody}' Width="474"/>
-        <TextBox x:Name="tbRequestAmount" HorizontalAlignment="Left" Height="21" Margin="629,56,0,0" TextWrapping="Wrap" Text='{Binding Path=RequestAmount, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly" />
-        <Label Content="Number of Requests:" HorizontalAlignment="Left" Height="26" Margin="505,53,0,0" VerticalAlignment="Top" Width="124"/>
+        <TextBox x:Name="tbUrlRequest" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text='{Binding Path=UrlRequest}' VerticalAlignment="Top" Width="548" Margin="97,10,0,0"/>
+        <Button Content="Send" HorizontalAlignment="Left" Height="24" Margin="650,10,0,0" VerticalAlignment="Top" Width="80" Click="Button_Click"/>
+        <TextBox x:Name="tbResponseBody" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="553,175,0,87" TextWrapping="Wrap" Text='{Binding Path=ResponseBody}' Width="187"/>
+        <TextBox x:Name="tbRequestAmount" HorizontalAlignment="Left" Height="21" Margin="677,56,0,0" TextWrapping="Wrap" Text='{Binding Path=RequestValue, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly" />
         <Label Content="Time Gap (seconds):" HorizontalAlignment="Left" Height="26" Margin="505,84,0,0" VerticalAlignment="Top" Width="124"/>
-        <TextBox x:Name="tbTimeGap" HorizontalAlignment="Left" Height="21" Margin="629,89,0,0" TextWrapping="Wrap" Text='{Binding Path=TimeGap, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
+        <TextBox x:Name="tbTimeGap" HorizontalAlignment="Left" Height="21" Margin="677,89,0,0" TextWrapping="Wrap" Text='{Binding Path=TimeGap, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
         <Label Content="Threads:" HorizontalAlignment="Left" Height="26" Margin="505,115,0,0" VerticalAlignment="Top" Width="124"/>
-        <Label Content="Duration (seconds):" HorizontalAlignment="Left" Height="26" Margin="505,146,0,0" VerticalAlignment="Top" Width="124"/>
-        <TextBox x:Name="tbThreadAmount" HorizontalAlignment="Left" Height="21" Margin="629,120,0,0" TextWrapping="Wrap" Text='{Binding Path=ThreadAmount, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
-        <TextBox x:Name="tbDuration" HorizontalAlignment="Left" Height="21" Margin="629,151,0,0" TextWrapping="Wrap" Text='{Binding Path=Duration, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
-        <Button Content="Configure Parameters" HorizontalAlignment="Left" VerticalAlignment="Top" Width="132" Margin="545,191,0,0" Click="Button_Click_1"/>
+        <TextBox x:Name="tbThreadAmount" HorizontalAlignment="Left" Height="21" Margin="677,125,0,0" TextWrapping="Wrap" Text='{Binding Path=ThreadAmount, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
+        <!--<Button Content="Configure Parameters" HorizontalAlignment="Left" VerticalAlignment="Top" Width="132" Margin="545,191,0,0" Click="Button_Click_1"/>-->
+        <ComboBox x:Name="cmbHttpMethod" HorizontalAlignment="Left" VerticalAlignment="Top" Width="82" Margin="10,10,0,0" Height="24" ItemsSource="{Binding Source={local:EnumBindingSource {x:Type local:HttpMethods}}}" SelectedItem="{Binding RequestMethod}" SelectedIndex="0"/>
+        <ComboBox x:Name="cmbRequestType" HorizontalAlignment="Left" VerticalAlignment="Top" Width="157" Margin="505,53,0,0" Height="24" ItemsSource="{Binding Source={local:EnumBindingSource {x:Type local:RequestType}}}" SelectedItem="{Binding RequestMethod}" SelectedIndex="0"/>
+        <ListView HorizontalAlignment="Left" Height="176" Margin="10,56,0,0" VerticalAlignment="Top" Width="490" Name="lvResponse">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <TextBlock Text="Status: " />
+                        <TextBlock Text="{Binding StatusCode}" FontWeight="Bold"/>
+                        <TextBlock Text=", Time: " />
+                        <TextBlock Text="{Binding Time}" FontWeight="Bold"/>
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <ProgressBar x:Name="PbStatusBar" HorizontalAlignment="Left" Height="13" Margin="13,38,0,0" VerticalAlignment="Top" Width="487" Minimum="0" />
+
     </Grid>
 </Window>

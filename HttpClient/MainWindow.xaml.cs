@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,16 @@ using System.Windows.Shapes;
 
 namespace HttpClientTester
 {
+    public enum HttpMethods { GET, POST }
+
+    [TypeConverter(typeof(EnumDescriptionTypeConverter))]
+    public enum RequestType
+    {
+        [Description("Number of Requests")]
+        Amount,
+        [Description("Duration (milliseconds)")]
+        Duration
+    }
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -35,6 +46,11 @@ namespace HttpClientTester
             _requestClient = new RequestClient();
             _requestTester = new RequestTester(_requestClient);
             mainGrid.DataContext = _requestClient;
+
+           /* List<ResponseInfo> list = new List<ResponseInfo>();
+            list.Add(new ResponseInfo("", 100, System.Net.HttpStatusCode.Accepted));
+            list.Add(new ResponseInfo("", 999, System.Net.HttpStatusCode.Ambiguous));
+            list.Add(new ResponseInfo("", 100, System.Net.HttpStatusCode.Created));*/
         }
 
         /// <summary> allows only numbers to be inputed to textbox </summary>
@@ -44,11 +60,41 @@ namespace HttpClientTester
         }
 
         /// <summary> Sends http request when button is clicked. Input parameters must be valid </summary>
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
+            _requestClient.RequestType = (RequestType)cmbRequestType.SelectedItem;
+            _requestClient.HttpMethodType = (HttpMethods)cmbHttpMethod.SelectedIndex;
+            _requestClient.ResponseList.Clear();
+
             if (_requestClient.IsValidRequest())
             {
-                 _requestClient.SendRequest();
+                PbStatusBar.Maximum = _requestClient.RequestValue;
+
+                if (_requestClient.RequestType == RequestType.Amount)
+                {
+                    for (int i = 0; i < _requestClient.RequestValue; i++)
+                    {
+                        await _requestClient.SendRequestTestAsync();
+                        lvResponse.ItemsSource = _requestClient.ResponseList;
+                        lvResponse.Items.Refresh();
+                        lvResponse.SelectedIndex = lvResponse.Items.Count - 1;
+                        lvResponse.ScrollIntoView(lvResponse.SelectedItem);
+                        PbStatusBar.Value = lvResponse.Items.Count;
+                    }
+                } else if (_requestClient.RequestType == RequestType.Duration)
+                {
+                    double time = 0;
+                    while (time < _requestClient.RequestValue)
+                    {
+                        ResponseInfo res = await _requestClient.SendRequestTestAsync();
+                        time += res.Time;
+                        lvResponse.ItemsSource = _requestClient.ResponseList;
+                        lvResponse.Items.Refresh();
+                        lvResponse.SelectedIndex = lvResponse.Items.Count - 1;
+                        lvResponse.ScrollIntoView(lvResponse.SelectedItem);
+                        PbStatusBar.Value = time;
+                    }
+                }
             }
         }
 
