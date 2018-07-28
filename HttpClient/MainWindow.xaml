@@ -12,27 +12,33 @@
     <Grid Name="mainGrid">
         <TextBox x:Name="tbUrlRequest" HorizontalAlignment="Left" Height="24" TextWrapping="Wrap" Text='{Binding Path=UrlRequest}' VerticalAlignment="Top" Width="548" Margin="97,10,0,0"/>
         <Button Content="Send" HorizontalAlignment="Left" Height="24" Margin="650,10,0,0" VerticalAlignment="Top" Width="80" Click="Button_Click"/>
-        <TextBox x:Name="tbResponseBody" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="553,175,0,87" TextWrapping="Wrap" Text='{Binding Path=ResponseBody}' Width="187"/>
         <TextBox x:Name="tbRequestAmount" HorizontalAlignment="Left" Height="21" Margin="677,56,0,0" TextWrapping="Wrap" Text='{Binding Path=RequestValue, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly" />
-        <Label Content="Time Gap (seconds):" HorizontalAlignment="Left" Height="26" Margin="505,84,0,0" VerticalAlignment="Top" Width="124"/>
+        <Label Content="Time Gap (milliseconds):" HorizontalAlignment="Left" Height="26" Margin="505,84,0,0" VerticalAlignment="Top" Width="157"/>
         <TextBox x:Name="tbTimeGap" HorizontalAlignment="Left" Height="21" Margin="677,89,0,0" TextWrapping="Wrap" Text='{Binding Path=TimeGap, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
-        <Label Content="Threads:" HorizontalAlignment="Left" Height="26" Margin="505,115,0,0" VerticalAlignment="Top" Width="124"/>
-        <TextBox x:Name="tbThreadAmount" HorizontalAlignment="Left" Height="21" Margin="677,125,0,0" TextWrapping="Wrap" Text='{Binding Path=ThreadAmount, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
-        <!--<Button Content="Configure Parameters" HorizontalAlignment="Left" VerticalAlignment="Top" Width="132" Margin="545,191,0,0" Click="Button_Click_1"/>-->
+        <Label Content="Concurrent Users:" HorizontalAlignment="Left" Height="26" Margin="505,115,0,0" VerticalAlignment="Top" Width="124"/>
+        <TextBox x:Name="tbConcurrentUsers" HorizontalAlignment="Left" Height="21" Margin="677,125,0,0" TextWrapping="Wrap" Text='{Binding Path=ConcurrentUsers, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MyConverter}}' VerticalAlignment="Top" Width="53" PreviewTextInput="TextBox_PreviewNumbersOnly"/>
         <ComboBox x:Name="cmbHttpMethod" HorizontalAlignment="Left" VerticalAlignment="Top" Width="82" Margin="10,10,0,0" Height="24" ItemsSource="{Binding Source={local:EnumBindingSource {x:Type local:HttpMethods}}}" SelectedItem="{Binding RequestMethod}" SelectedIndex="0"/>
         <ComboBox x:Name="cmbRequestType" HorizontalAlignment="Left" VerticalAlignment="Top" Width="157" Margin="505,53,0,0" Height="24" ItemsSource="{Binding Source={local:EnumBindingSource {x:Type local:RequestType}}}" SelectedItem="{Binding RequestMethod}" SelectedIndex="0"/>
-        <ListView HorizontalAlignment="Left" Height="176" Margin="10,56,0,0" VerticalAlignment="Top" Width="490" Name="lvResponse">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <WrapPanel>
-                        <TextBlock Text="Status: " />
-                        <TextBlock Text="{Binding StatusCode}" FontWeight="Bold"/>
-                        <TextBlock Text=", Time: " />
-                        <TextBlock Text="{Binding Time}" FontWeight="Bold"/>
-                    </WrapPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+        <TabControl Name="tbControl" Margin="13,77,240,41">
+            <TabItem Header="Response Info">
+                <ListView Name="lvResponse">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <WrapPanel>
+                                <TextBlock Text="Status: " />
+                                <TextBlock Text="{Binding StatusCode}" FontWeight="Bold"/>
+                                <TextBlock Text=", Time: " />
+                                <TextBlock Text="{Binding Time}" FontWeight="Bold"/>
+                                <TextBlock Text="ms" FontWeight="Bold" />
+                            </WrapPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </TabItem>
+            <TabItem Header="POST Body">
+                <TextBox x:Name="tbPostBody" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Text='{Binding Path=PostBody}' AcceptsReturn="True" AcceptsTab="True"/>
+            </TabItem>
+        </TabControl>
         <ProgressBar x:Name="PbStatusBar" HorizontalAlignment="Left" Height="13" Margin="13,38,0,0" VerticalAlignment="Top" Width="487" Minimum="0" />
 
     </Grid>

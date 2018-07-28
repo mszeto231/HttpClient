@@ -10,6 +10,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace HttpClientTester
 {
@@ -18,17 +21,15 @@ namespace HttpClientTester
     {
         private string _urlRequest;         // url of http request
         private int _timeGap;               // amount of time (milliseconds) between each request
-        private int _threadAmount;          // number of threads used to send requests
-        private string _responseBody;       // response body of the request made
         private List<ResponseInfo> _responseList;
 
         private HttpClient _client;         // client used to create http requests
-        private List<Thread> _threadList;   // list of threads used to run http requests
-        private CountdownEvent _countdown;   // records when each thread is done
 
         public HttpMethods HttpMethodType { get; set; }
         public RequestType RequestType { get; set; }
         public int RequestValue { get; set; }
+        public string PostBody { get; set; }
+        public int ConcurrentUsers { get; set; }
         public List<ResponseInfo> ResponseList
         {
             get { return _responseList; }
@@ -49,31 +50,10 @@ namespace HttpClientTester
             set { _timeGap = value;}
         }
 
-        // binded to tbThreadAmount
-        public int ThreadAmount
-        {
-            get { return _threadAmount; }
-            set
-            { _threadAmount = value;
-                NotifyPropertyChanged("ThreadAmount");
-            }
-        }
-
-        // binded to tbResponseBody
-        public string ResponseBody
-        {
-            get { return _responseBody; }
-            set
-            {
-                _responseBody = value;
-                NotifyPropertyChanged("ResponseBody");
-            }
-        }
 
         public RequestClient()
         {
             _client = new HttpClient();
-            _threadList = new List<Thread>();
             _responseList = new List<ResponseInfo>();
         }
 
@@ -93,43 +73,51 @@ namespace HttpClientTester
             Thread.Sleep(_timeGap);
             return res;
         }
-        /// <summary>
-        /// Creates and sends an HTTP request and sets ResponseBody message
-        /// </summary>
-        public void SendRequest()
+
+        public void SendAmountRequest(ListView listView, ProgressBar progressBar)
         {
             _responseList.Clear();
-            ResponseBody = string.Empty;
-            _countdown = new CountdownEvent(_threadAmount);
-            DateTime startTime = DateTime.UtcNow;
-            if (RequestType == RequestType.Amount)
+            Parallel.For(0, RequestValue, async i =>
             {
-                // sends _requestAmount of http requests
-                int reqPerThread = RequestValue / _threadAmount;
-                for (int i = 0; i < _threadAmount; i++)
+                ResponseInfo res = await Request();
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    Thread thread = new Thread(() => AmountRequests(reqPerThread));
-                    _threadList.Add(thread);
-                    thread.Start();
-                }
-            }
-            else  
-            {
-                // sends Http requests for _duration milliseconds
-                for (int i = 0; i < _threadAmount; i++)
-                {
-                    Thread thread = new Thread(() => DurationRequests());
-                    _threadList.Add(thread);
-                    thread.Start();
-                }
-            }
-
-            _countdown.Wait();
-            double milliseconds = (DateTime.UtcNow - startTime).TotalMilliseconds;
-
-            Console.WriteLine("Time: " + milliseconds);
-            _threadList.Clear();
+                    Update(res, listView);
+                    progressBar.Value = _responseList.Count;
+                });
+                Thread.Sleep(_timeGap);
+            });
         }
+        
+        public async Task SendDurationRequestAsync(ListView listView, ProgressBar progressBar)
+        {
+            _responseList.Clear();
+            double time = 0;
+            while (time < RequestValue)
+            {
+                ResponseInfo res = await Request();
+                time += res.Time;
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Update(res, listView);
+                    progressBar.Value = time;
+                });
+                Thread.Sleep(_timeGap);
+            }
+        }
+
+        private void Update(ResponseInfo res, ListView listView)
+        {
+            _responseList.Add(res);
+            listView.Items.Refresh();
+            var selectedIndex = listView.Items.Count - 1;
+            if (selectedIndex < 0)
+                return;
+
+            listView.SelectedIndex = selectedIndex;
+            listView.ScrollIntoView(listView.SelectedItem);
+        }
+       
 
         /// <summary> Creates and sends an HTTP request  </summary>
         /// <returns> Information about the HTTP response </returns>
@@ -142,7 +130,10 @@ namespace HttpClientTester
             }
             else
             {
-                request = new HttpRequestMessage(HttpMethod.Post, _urlRequest);
+                request = new HttpRequestMessage(HttpMethod.Post, _urlRequest)
+                {
+                    Content = new StringContent(PostBody, Encoding.UTF8, "application/json")
+                };
             }
 
             try
@@ -162,32 +153,8 @@ namespace HttpClientTester
             }
             catch (Exception ex)
             {
-                return new ResponseInfo(ex.Message);
+                return new ResponseInfo(ex.Message, 0, HttpStatusCode.NotFound);
             }
-        }
-
-        private async void AmountRequests(int reqPerThread)
-        {
-            for (int i = 0; i < reqPerThread; i++)
-            {
-                ResponseInfo res = await Request();
-                _responseList.Add(res);
-                Thread.Sleep(_timeGap);
-            }
-            _countdown.Signal();
-        }
-
-        private async void DurationRequests()
-        {
-            double time = 0;
-            while (time < RequestValue)
-            {
-                ResponseInfo res = await Request();
-                time += res.Time;
-                _responseList.Add(res);
-                Thread.Sleep(_timeGap);
-            }
-            _countdown.Signal();
         }
 
         /// <returns>
@@ -195,7 +162,7 @@ namespace HttpClientTester
         /// </returns>
         public bool IsValidRequest()
         {
-            return (_urlRequest != null && _timeGap != 0 && _threadAmount != 0 && RequestValue != 0);
+            return (_urlRequest != null && _timeGap != 0 && ConcurrentUsers != 0 && RequestValue != 0);
         }
 
         /// <returns>
@@ -207,10 +174,6 @@ namespace HttpClientTester
             return _urlRequest != null;
         }
 
-        public void SetThreadAmount(int threadAmount)
-        {
-            ThreadAmount = threadAmount;
-        }
         /// <returns>
         /// returns string format of object in form of  {Property: value, Property: value, ect}
         /// </returns>
