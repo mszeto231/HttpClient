@@ -57,7 +57,6 @@
     <Compile Include="EnumBindingSourceExtension.cs" />
     <Compile Include="EnumDescriptionTypeConverter.cs" />
     <Compile Include="RequestClient.cs" />
-    <Compile Include="RequestTester.cs" />
     <Compile Include="ResponseInfo.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

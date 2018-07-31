@@ -38,13 +38,11 @@ namespace HttpClientTester
         private static readonly Regex _regex = new Regex("^[0-9]+$");  // text expression is a number
 
         private RequestClient _requestClient;
-        private RequestTester _requestTester;
 
         public MainWindow()
         {
             InitializeComponent();
             _requestClient = new RequestClient();
-            _requestTester = new RequestTester(_requestClient);
             mainGrid.DataContext = _requestClient;
         }
 
@@ -59,21 +57,25 @@ namespace HttpClientTester
         {
             _requestClient.RequestType = (RequestType)cmbRequestType.SelectedItem;
             _requestClient.HttpMethodType = (HttpMethods)cmbHttpMethod.SelectedIndex;
-           // _requestClient.ResponseList.Clear();
+            requestNumberLabel.Content = "Total Requests: ";
+            averageTimeLabel.Content = "Average Request Time: ";
 
             if (_requestClient.IsValidRequest())
             {
+                _requestClient.ResponseList.Clear();
                 PbStatusBar.Maximum = _requestClient.RequestValue;
                 lvResponse.ItemsSource = _requestClient.ResponseList;
 
                 if (_requestClient.RequestType == RequestType.Amount)
                 {
-                    _requestClient.SendAmountRequest(lvResponse, PbStatusBar);
+                     await _requestClient.SendAmountRequest(lvResponse, PbStatusBar);
                 }
                 else if (_requestClient.RequestType == RequestType.Duration)
                 {
                     await _requestClient.SendDurationRequestAsync(lvResponse, PbStatusBar);
                 }
+                requestNumberLabel.Content = "Total Requests: " + _requestClient.ResponseList.Count;
+                averageTimeLabel.Content = "Average Request Time: " + _requestClient.AverageRequestTime() + "ms";
             }
         }
 
@@ -82,18 +84,6 @@ namespace HttpClientTester
         private bool IsNumber(string text)
         {
             return _regex.IsMatch(text);
-        }
-
-        private async void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            if (_requestClient.IsValidSample())
-            {
-                await _requestTester.RunTestsAsync(REQUEST_TRYS);
-                double time = _requestTester.AverageRequestTime();
-                int threads = _requestTester.ComputeThreadCount(REQUEST_NUMBER);
-                //_requestClient.SetThreadAmount(threads);
-                //Console.WriteLine("Test: " + _requestClient.ThreadAmount);
-            }
         }
     }
 }

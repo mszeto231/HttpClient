@@ -40,6 +40,8 @@
             </TabItem>
         </TabControl>
         <ProgressBar x:Name="PbStatusBar" HorizontalAlignment="Left" Height="13" Margin="13,38,0,0" VerticalAlignment="Top" Width="487" Minimum="0" />
+        <Label x:Name="requestNumberLabel" Content="Total Requests:" HorizontalAlignment="Left" Height="26" Margin="13,278,0,0" VerticalAlignment="Top" Width="130"/>
+        <Label x:Name="averageTimeLabel" Content="Average Request Time:" HorizontalAlignment="Left" Height="26" Margin="197,278,0,0" VerticalAlignment="Top" Width="205"/>
 
     </Grid>
 </Window>

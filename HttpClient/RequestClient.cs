@@ -74,36 +74,62 @@ namespace HttpClientTester
             return res;
         }
 
-        public void SendAmountRequest(ListView listView, ProgressBar progressBar)
+        public async Task SendAmountRequest(ListView listView, ProgressBar progressBar)
         {
-            _responseList.Clear();
-            Parallel.For(0, RequestValue, async i =>
+            var task = Task.Run(() =>
             {
-                ResponseInfo res = await Request();
-                Application.Current.Dispatcher.Invoke(() =>
+                int numRequests = RequestValue / ConcurrentUsers;
+                int count = 0;
+                Parallel.For(0, ConcurrentUsers, i =>
                 {
-                    Update(res, listView);
-                    progressBar.Value = _responseList.Count;
+                    while (count < RequestValue)
+                    {
+                        ResponseInfo res = Request().Result;
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            if (_responseList.Count < RequestValue)
+                            {
+                                Update(res, listView);
+                                progressBar.Value = _responseList.Count;
+                            }
+                            count++;
+                        });
+                        Thread.Sleep(_timeGap);
+                    }
                 });
-                Thread.Sleep(_timeGap);
             });
+            await task;
         }
         
         public async Task SendDurationRequestAsync(ListView listView, ProgressBar progressBar)
         {
-            _responseList.Clear();
-            double time = 0;
-            while (time < RequestValue)
+            var task = Task.Run(() => 
             {
-                ResponseInfo res = await Request();
-                time += res.Time;
-                Application.Current.Dispatcher.Invoke(() =>
+                double time = 0;
+                Parallel.For(0, ConcurrentUsers, i =>
                 {
-                    Update(res, listView);
-                    progressBar.Value = time;
+                    while (time < RequestValue)
+                    {
+                        ResponseInfo res = Request().Result;
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            double timeCount = 0;
+                            for (int j = 0; i < _responseList.Count; i++)
+                            {
+                                timeCount += _responseList[j].Time;
+                            }
+                            if (timeCount < RequestValue)
+                            {
+                                time += res.Time;
+                                Update(res, listView);
+                                progressBar.Value = time;
+                            }
+                        });
+                        Thread.Sleep(_timeGap);
+                    }
                 });
-                Thread.Sleep(_timeGap);
-            }
+            });
+            await task;
         }
 
         private void Update(ResponseInfo res, ListView listView)
@@ -174,6 +200,23 @@ namespace HttpClientTester
             return _urlRequest != null;
         }
 
+        public int AverageRequestTime()
+        {
+            int cutoff = 0;
+            if (ResponseList.Count >= 10)
+            {
+                cutoff = (int)(ResponseList.Count * 0.1);
+            }
+            double sum = 0;
+            int count = 0;
+
+            for (int i = cutoff; i < ResponseList.Count - cutoff; i++)
+            {
+                sum += ResponseList[i].Time;
+                count++;
+            }
+            return (int) (sum / count);
+        }
         /// <returns>
         /// returns string format of object in form of  {Property: value, Property: value, ect}
         /// </returns>
